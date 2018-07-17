@@ -181,15 +181,32 @@ def sum_bytes_user(dict):
 #** Function to Process per AD Group data **
 
 
+def find_str(s, char):
+    index = 0
+
+    if char in s:
+        c = char[0]
+        for ch in s:
+            if ch == c:
+                if s[index:index+len(char)] == char:
+                    return index
+
+            index += 1
+
+    return -1
+
+
 def get_group(ip,key,aduser):
     url = "http://"+ip+"/api/?type=op&key="+key+"&cmd=<show><user><user-ids><match-user>"+aduser+"</match-user></user-ids></user></show>"
+    print(url)
     response = requests.post(url)
     with open("adgroup.txt","w") as f:
         f.write(response.text)
     with open("adgroup.txt","r") as f:
         line = f.readlines()
         groupline = line[3]
-    return(groupline[64:-2])
+    pos = find_str(groupline, " cn=")
+    return(groupline[pos+1:-2])
 
 
 def extract_bytes_group(userbyted):
