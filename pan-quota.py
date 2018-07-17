@@ -198,7 +198,7 @@ def find_str(s, char):
 
 def get_group(ip,key,aduser):
     url = "http://"+ip+"/api/?type=op&key="+key+"&cmd=<show><user><user-ids><match-user>"+aduser+"</match-user></user-ids></user></show>"
-    #print(url)
+    print(url)
     response = requests.post(url)
     with open("adgroup.txt","w") as f:
         f.write(response.text)
@@ -361,6 +361,8 @@ while True:
     violategroup = list(compare_bytes(dictbytegroupsum,bytesize))
     print("Usage status by User: ", dictusersum)
     violateuser = list(compare_bytes(dictusersum,bytesize))
+    print("Usage status by IP: ",dictipbytesum)
+    violateip = list(compare_bytes(dictipbytesum,bytesize))
 
 
     #Process to Block by Group
@@ -372,6 +374,41 @@ while True:
                 t = datetime.datetime.now()
                 loggroup[badgroup] = t
 
+    #Process to Block by User
+    if len(violateuser) != 0:
+        if '' not in violateuser:
+            print("Violated User:",violateuser)
+            listadd = []
+            for baduser in violateuser:
+                for add, usr in dictuser.items():
+                    if baduser == usr:
+                        if add not in violateip:
+                            listadd.append(add)
+                            violateip.append(add)
+            #print(listadd)
+            register_tag(listadd, ipaddr, k)
+
+    #Process to Block by IP
+    if len(violateip) != 0:
+        register_tag(violateip,ipaddr,k)
+        print("Violated IP:",violateip)
+        for badip in violateip:
+            if badip not in log.keys():
+                t = datetime.datetime.now()
+                log[badip] = t
+        violate = []
+
+
+    #Process to Release IP
+    if bool(log) == True:
+        release_list = []
+        for ip,ti in log.items():
+            if ti <= (datetime.datetime.now() - datetime.timedelta(minutes=15)):
+                release_list.append(ip)
+                unregister_tag(release_list, ipaddr, k)
+                print("Released IP:",ip)
+        if len(release_list) != 0:
+            log = {}
 
     #Process to Release Group
     if bool(loggroup) == True:
@@ -384,6 +421,7 @@ while True:
         if len(release_list_group) != 0:
             loggroup = {}
 
+    print("Currently blocked IP list: ", log)
     print("Currently blocked group ", loggroup)
 
     time.sleep(60.0 - (time.time() % 60.0))

@@ -135,6 +135,7 @@ def extract_user(db):
         return(dict3)
 
 
+
 #Mapping User to Bytes format bytes -- user
 def extract_user_bytes(userd,bytesd):
     userl = list(userd.values())
@@ -357,34 +358,51 @@ while True:
     dictbytegroupsum = sum_bytes_group(dictbytegroup) #>>> Map Group - Sum of Bytes
 
     # Begin process data
-    print("Usage status by AD Group: ", dictbytegroupsum)
-    violategroup = list(compare_bytes(dictbytegroupsum,bytesize))
     print("Usage status by User: ", dictusersum)
     violateuser = list(compare_bytes(dictusersum,bytesize))
+    print("Usage status by IP: ",dictipbytesum)
+    #violateip = list(compare_bytes(dictipbytesum,bytesize))
+    violateip = []
 
 
-    #Process to Block by Group
-    if len(violategroup) != 0:
-        block_group(ipaddr,k,violategroup)
-        print("Violated Group:", violategroup)
-        for badgroup in violategroup:
-            if badgroup not in loggroup.keys():
+    #Process to Block by User
+    if len(violateuser) != 0:
+        if '' not in violateuser:
+            print("Violated User:",violateuser)
+            listadd = []
+            for baduser in violateuser:
+                for add, usr in dictuser.items():
+                    if baduser == usr:
+                        if add not in violateip:
+                            listadd.append(add)
+                            violateip.append(add)
+            #print(listadd)
+            register_tag(listadd, ipaddr, k)
+
+    #Process to Block by IP
+    if len(violateip) != 0:
+        register_tag(violateip,ipaddr,k)
+        print("Violated IP:",violateip)
+        for badip in violateip:
+            if badip not in log.keys():
                 t = datetime.datetime.now()
-                loggroup[badgroup] = t
+                log[badip] = t
+        violate = []
 
 
-    #Process to Release Group
-    if bool(loggroup) == True:
-        release_list_group = []
-        for ipg,tig in loggroup.items():
-            if tig <= (datetime.datetime.now() - datetime.timedelta(minutes=15)):
-                release_list_group.append(ipg)
-                release_group(ipaddr, k, release_list_group)
-                print("Released Group:",ipg)
-        if len(release_list_group) != 0:
-            loggroup = {}
+    #Process to Release IP
+    if bool(log) == True:
+        release_list = []
+        for ip,ti in log.items():
+            if ti <= (datetime.datetime.now() - datetime.timedelta(minutes=15)):
+                release_list.append(ip)
+                unregister_tag(release_list, ipaddr, k)
+                print("Released IP:",ip)
+        if len(release_list) != 0:
+            log = {}
 
-    print("Currently blocked group ", loggroup)
+
+    print("Currently blocked IP list: ", log)
 
     time.sleep(60.0 - (time.time() % 60.0))
 
