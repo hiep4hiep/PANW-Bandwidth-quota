@@ -11,7 +11,7 @@ Check which IP(s) are exceed the quota (I set 20MB). Calculate aggregate bandwid
 - Block violated User. Even if he uses 2 or 3 IPs, block them all by DAG.
 - Block violated AD Group based on aggregated traffic of group. Then the script will create a Security Rule named BlockQuota to block this group. 
  
-4. After 15 minutes, these IP(s) will be released. That means I unregistered them from DAG. Then these IP(s) can connect to internet again.
+4. After 15 minutes, these IP(s), Group(s) will be released. The script unregistered them from DAG and remove security rule. Then these IP(s)/User(s)/Group(s) can connect to internet again.
 
 
  
