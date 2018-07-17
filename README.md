@@ -1,4 +1,4 @@
-# PaloAltoNetworks limit quota per IP, User, AD Group
+# PaloAltoNetworks limit bandwidth quota per IP, User, AD Group
 
 Function:
 1. When you run the script, it asks for Firewall IP, username and password to log in. You should use superuser admin or whatever credential with full XML API permission.
