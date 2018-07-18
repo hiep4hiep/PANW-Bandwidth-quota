@@ -7,9 +7,10 @@ Get the bandwidth usage report from Firewall.
 Check which IP(s) are exceed the quota (I set 20MB). Calculate aggregate bandwidth usage per user, per AD group and check for maximum quota.
 
 3. For violated objects:
-- Block violated IP only, block by DAG.
-- Block violated User. Even if he uses 2 or 3 IPs, block them all by DAG.
-- Block violated AD Group based on aggregated traffic of group. Then the script will create a Security Rule named BlockQuota to block this group. 
+- Block violated IP only, block by DAG. (pan-quota1.py)
+- Block violated User. Even if he uses 2 or 3 IPs, block them all by DAG (pan-quota2.py).
+- Block violated AD Group based on aggregated traffic of group. Then the script will create a Security Rule named BlockQuota to block this group. (pan-quota3.py)
+- For all 3 features in one, use pan-quota.py
  
 4. After 15 minutes, these IP(s), Group(s) will be released. The script unregistered them from DAG and remove security rule. Then these IP(s)/User(s)/Group(s) can connect to internet again.
 
@@ -20,7 +21,7 @@ How to set up:
 1. How to run the script:
 - Install python3.x in your Mac. If you run it in linux (Ubuntu, Kali), just run (sudo apt-get update && sudo apt-get install python3.6 && sudo apt-get install python3-pip).
 - Install lib in Mac or Linux (pip3 install requests)
-- Run it in terminal: python3 pan-quota3.py
+- Run it in terminal: python3 pan-quota.py
 - In each 1 minitue cycle, it will show in terminal information of bandwidth usage status, which IP(s)/User(s)/Group(s) are blocked, which IP(s)/User(s)/Group(s) are released.
 
 2. How to set up the Firewall:
